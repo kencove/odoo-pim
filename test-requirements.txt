@@ -1,3 +1,4 @@
+odoo_test_helper
 odoo-addon-attribute_set @ git+https://github.com/OCA/odoo-pim.git@refs/pull/192/head#subdirectory=attribute_set
 odoo-addon-product_attribute_set @ git+https://github.com/OCA/odoo-pim.git@refs/pull/196/head#subdirectory=product_attribute_set
 odoo-addon-pim @ git+https://github.com/OCA/odoo-pim.git@refs/pull/197/head#subdirectory=pim
