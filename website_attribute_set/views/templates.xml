@@ -12,7 +12,7 @@
         >
             <attribute
                 name="t-if"
-            >attributes or all_tags or additional_attributes</attribute>
+            >bool(attributes or all_tags or additional_attributes) and bool(category)</attribute>
         </xpath>
         <xpath expr="//div[@t-if='attrib_values or tags']" position="attributes">
             <attribute
