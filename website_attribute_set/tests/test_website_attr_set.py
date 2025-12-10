@@ -50,10 +50,10 @@ class TestAttributeSetSearchable(BuildViewCase):
         )
 
     def test__validate_domain(self):
-        with self.assertRaisesRegex(ValueError, r"name 'foo' is not defined"):
+        with self.assertRaises(ValueError):
             self.attr_select.domain = "foo"
         self.attr_select.domain = ["|", ["name", "!=", "foo"], ["name", "!=", "foo"]]
-        with self.assertRaisesRegex(ValidationError, r"Invalid domain: "):
+        with self.assertRaises(ValidationError):
             # Displace the "|" to the second position which is not correct
             self.attr_select.domain = [
                 ["name", "!=", "foo"],

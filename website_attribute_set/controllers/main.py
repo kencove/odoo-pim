@@ -17,6 +17,7 @@ from odoo.addons.website_sale.controllers import main
 
 
 class WebsiteSale(main.WebsiteSale):
+    # START PATCH
     @route()
     def shop(
         self,
@@ -316,6 +317,8 @@ class WebsiteSale(main.WebsiteSale):
         values.update(self._get_additional_extra_shop_values(values, **post))
 
         return request.render("website_sale.products", values)
+
+    # END PATCH
 
     def _get_search_options(
         self,
