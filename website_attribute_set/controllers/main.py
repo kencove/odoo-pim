@@ -30,7 +30,7 @@ class WebsiteSale(main.WebsiteSale):
         **post,
     ):
         if not request.website.has_ecommerce_access():
-            return request.redirect("/web/login")
+            return request.redirect(f"/web/login?redirect={request.httprequest.path}")
         try:
             min_price = float(min_price)
         except ValueError:
@@ -73,6 +73,7 @@ class WebsiteSale(main.WebsiteSale):
 
         # anyalyze the url args to be used in filter and search
         request_args = request.httprequest.args
+        # START HOOK 1
         additional_attrib_list = request_args.getlist("additional_attribute_value")
         additional_attrib_values = [
             [x for x in v.split("-", maxsplit=1)] for v in additional_attrib_list if v
@@ -85,6 +86,7 @@ class WebsiteSale(main.WebsiteSale):
         )
         post["additional_attrib_set"] = additional_attrib_set
         post["additional_attrib_values"] = additional_attrib_values
+        # END HOOK 1
 
         filter_by_tags_enabled = website.is_view_active(
             "website_sale.filter_products_tags"
@@ -159,7 +161,8 @@ class WebsiteSale(main.WebsiteSale):
             # TODO Find an alternative way to obtain
             # the domain through the search metadata.
             Product = request.env["product.template"].with_context(bin_size=True)
-            domain = self._get_shop_domain(search, category, attrib_values)
+            search_term = fuzzy_search_term if fuzzy_search_term else search
+            domain = self._get_shop_domain(search_term, category, attrib_values)
 
             # This is ~4 times more efficient than a search
             # for the cheapest and most expensive products
@@ -203,8 +206,10 @@ class WebsiteSale(main.WebsiteSale):
                 expression.AND(
                     [
                         [
-                            ("product_ids.is_published", "=", True),
                             ("visible_on_ecommerce", "=", True),
+                            "|",
+                            ("product_template_ids.is_published", "=", True),
+                            ("product_product_ids.is_published", "=", True),
                         ],
                         website_domain,
                     ]
@@ -235,16 +240,19 @@ class WebsiteSale(main.WebsiteSale):
         ProductAttribute = request.env["product.attribute"]
         if products:
             # get all products without limit
-            attributes = lazy(
-                lambda: ProductAttribute.search(
-                    [
-                        ("product_tmpl_ids", "in", search_product.ids),
-                        ("visibility", "=", "visible"),
-                    ]
-                )
+            attributes_grouped = request.env[
+                "product.template.attribute.line"
+            ]._read_group(
+                domain=[
+                    ("product_tmpl_id", "in", search_product.ids),
+                    ("attribute_id.visibility", "=", "visible"),
+                ],
+                groupby=["attribute_id"],
             )
-        else:
-            attributes = lazy(lambda: ProductAttribute.browse(attributes_ids))
+            attributes_ids = [
+                attribute.id for attribute, *aggregates in attributes_grouped
+            ]
+        attributes = lazy(lambda: ProductAttribute.browse(attributes_ids))
 
         layout_mode = request.session.get("website_sale_shop_layout_mode")
         if not layout_mode:
@@ -284,7 +292,9 @@ class WebsiteSale(main.WebsiteSale):
             "category": category,
             "attrib_values": attrib_values,
             "attrib_set": attrib_set,
+            # START HOOK 2
             "additional_attrib_set": additional_attrib_set,
+            # END HOOK 2
             "pager": pager,
             "products": products,
             "search_product": search_product,
