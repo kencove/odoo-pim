@@ -50,7 +50,7 @@ class TestAttributeSetSearchable(BuildViewCase):
         )
 
     def test__validate_domain(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             self.attr_select.domain = "foo"
         self.attr_select.domain = ["|", ["name", "!=", "foo"], ["name", "!=", "foo"]]
         with self.assertRaises(ValidationError):

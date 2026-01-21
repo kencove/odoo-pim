@@ -9,7 +9,7 @@
 
 # odoo-pim
 
-odoo-pim
+Product Information Management.
 
 <!-- /!\ do not modify below this line -->
 
@@ -17,7 +17,13 @@ odoo-pim
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[attribute_set](attribute_set/) | 18.0.1.0.0 |  | Attribute Set
+[pim](pim/) | 18.0.1.0.0 |  | Product Information Management
+[product_attribute_set](product_attribute_set/) | 18.0.1.0.0 |  | Product Attribute Set
 
 [//]: # (end addons)
 
